@@ -1,6 +1,6 @@
 String.prototype.find = function(){
     return /\d/g.exec(this);
-}
+};
 
 Select = {
     internalEvent: {},
@@ -35,8 +35,10 @@ Select = {
         Select.internalEvent = null;
     },
     _getSelection: function() {
-        var w = window, d = document, s = '', u, nok = 5.9355, currentInt, value;
+        var w = window, d = document, s = '', u, nok = currencyArea.requestCurrency(), currentInt, value;
         
+        console.log(nok);
+
         if (w.getSelection != u) { s = w.getSelection();}
         else if (d.getSelection != u) { s = d.getSelection(); }
         else if (d.selection) { s = d.selection.createRange().text; }
@@ -63,9 +65,41 @@ Select = {
         bubbleDOM.style.visibility = 'hidden';
         console.log("bubble is hidden: " + bubbleDOM);
     }
-}
+};
 
-function AttackListner(){
+var currencyArea = {
+    getCurrencyFeed_: 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',
+
+    requestCurrency: function(){
+        var req = new XMLHttpRequest();
+        console.log("XML request: " + req);
+        req.open("GET", this.getCurrencyFeed_, true);
+        console.log("XML request after open: " + req);
+        console.log(this.getCurrencies_.bind(this));
+        return this.getCurrencies_.bind(this);
+        //req.onload = this.getCurrencies_.bind(this);
+        //req.send(null);
+    },
+
+    getCurrencies_: function(e){
+        var returValue;
+        var currencies = e.target.responseXML.getElementsByTagName('Cube');
+        for(var i = 0; i<currencies.length; i++){
+            var currencyAttributes = currencies[i].attributes;
+
+            for(var j = 0; j<currencyAttributes.length; j++){
+                var currentAttribute = currencyAttributes[j];
+                if(currentAttribute.nodeValue === "NOK"){
+                    returValue = currencyAttributes[j+1].nodeValue;
+                    console.log("NOK currency: " + currencyAttributes[j+1].nodeValue);
+                }
+            }
+        }
+        return returValue;
+    }
+};
+
+function AttachListner(){
     var t = window.setInterval(function(){
         if(/loaded|complete/.test(document.readyState)){
             window.clearInterval(t);            
@@ -75,8 +109,8 @@ function AttackListner(){
     }, 10)
 };
 
-AttackListner();
-
+AttachListner();
+//currencyArea.requestCurrency();
 
 // document.addEventListener("mouseup", function(e) {
 //     var selectedArea = window.getSelection();

@@ -2,7 +2,7 @@
 	//Required
 	"manifest_version": 2,
 	"name": "Currency transformer",
-	"version": "0.0.3.2",
+	"version": "0.0.5.4",
 	//End required
 
 	"description":"This is just me trying to make a chrome extension",
