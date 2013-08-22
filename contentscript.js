@@ -18,14 +18,11 @@
                 Select.internalEvent = event;
                 Select.polling = window.setInterval(Select.onMouseUp(event), 200);
             });
-            console.log("Select Actions listener attached.");
         },
         SetupBubble: function(){
             bubbleDOM = document.createElement('div');
             bubbleDOM.setAttribute('class', 'selection_bubble');
             document.body.appendChild(bubbleDOM);
-
-            console.log("Setup bubble: " + bubbleDOM);
         },
         onMouseUp: function(event){
             window.clearInterval(Select.polling);
@@ -41,7 +38,7 @@
             Select.internalEvent = null;
         },
         _getSelection: function() {
-            var w = window, d = document, s = '', u, currentInt, value;
+            var w = window, d = document, s = '', u, currentInt, value, currencyValue, currentCurrency, newInt;
 
             if (w.getSelection != u) { s = w.getSelection().toString();}
             else if (d.getSelection != u) { s = d.getSelection().toString(); }
@@ -60,10 +57,18 @@
 
             if(currentInt === null)
                 return;
+            currencyValue = currencyArea.requestCurrency("NOK");
 
-            currentInt = currentInt / currencyArea.requestCurrency("USD");
+            console.log("NOK");
+            console.log(currencyValue);
 
-            value = currentInt * curencyValue;
+            currentCurrency = currencyArea.requestCurrency("USD");
+            console.log("USD");
+            console.log(currentCurrency);
+
+            newInt = currentInt / currentCurrency;
+
+            value = newInt * currencyValue;
 
             console.log("_getSelection value:" + value);
 
@@ -78,37 +83,39 @@
             bubbleDOM.style.top = mouseY -25 + 'px';
             bubbleDOM.style.left = mouseX + 'px';
             bubbleDOM.style.visibility = 'visible';
-            console.log("Bubble is buildt: " + bubbleDOM);
         },
         HideBubble: function(){
             Select.selecting = false;
             bubbleDOM.style.visibility = 'hidden';
-            console.log("bubble is hidden: " + bubbleDOM);
         }
     };
 
     var currencyArea = {
+
         getCurrencyFeed_: 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',
 
         requestCurrency: function(value){
+        	var currencies;
             var req = new XMLHttpRequest();
-            req.open("GET", currencyArea.getCurrencyFeed_, true);
-            req.onload = currencyArea.getCurrencies_.bind(value, req);
+            req.open("GET", this.getCurrencyFeed_, false);
             req.send(null);
 
-            console.log(req.responseText);
+            currencies = req.responseXML;
 
-            return req.responseText;
+            console.log(currencies);
+
+            var test = this.getCurrencies_(currencies, value);
+
+            console.log("requestCurrency value");
+            console.log(test);
+
+            return test;
         },
 
-        getCurrencies_: function(value, req){
-            //console.log(value);
-            console.log(this);
-            console.log("e:");
-            console.log(req);
-            console.log("value:");
-            console.log(value);
-            var currencies = req.responseXML.getElementsByTagName('Cube');
+        getCurrencies_: function(req, value){
+            var currencies = req.getElementsByTagName('Cube');
+            console.log("currencies");
+            console.log(currencies);
             var currencyValue;
             for(var i = 0; i<currencies.length; i++){
                 var currencyAttributes = currencies[i].attributes;
@@ -116,12 +123,13 @@
                 for(var j = 0; j<currencyAttributes.length; j++){
                     var currentAttribute = currencyAttributes[j];
                     if(currentAttribute.nodeValue === value){
-                        curencyValue = currencyAttributes[j+1].nodeValue;
+                        currencyValue = currencyAttributes[j+1].nodeValue;
                         console.log(value + " currency: " + currencyAttributes[j+1].nodeValue);
                     }
                 }
             }
-
+            console.log("retur value : ");
+            console.log(currencyValue);
             return currencyValue;
         }
     };
@@ -142,7 +150,15 @@
 
     //         getCorrectCountry: function(){
     //             var countryCode = "USE"
-
+    //             switch(case this.html)
+    //             {
+    //             	case "en":
+    //             		countryCode = "USE";
+    //             		break;
+    //             	case "no":
+    //             		countryCode = "NOK";
+    //             		break;
+    //             }
     //             return countryCode;
     //         }
     // }
@@ -157,6 +173,6 @@
         }, 10);
     };
 
+    //languageManager.getCorrectCountry();
     AttachListner();
-    currencyArea.requestCurrency("NOK");
 })()
