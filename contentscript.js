@@ -93,18 +93,20 @@
     var currencyArea = {
 
         getCurrencyFeed_: 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',
-
+        _currencyList: null,
         requestCurrency: function(value){
-        	var currencies;
-            var req = new XMLHttpRequest();
-            req.open("GET", this.getCurrencyFeed_, false);
-            req.send(null);
+            if(this._currencyList === null){
+                var req = new XMLHttpRequest();
+                req.open("GET", this.getCurrencyFeed_, false);
+                req.send(null);
 
-            currencies = req.responseXML;
+                this._currencyList = req.responseXML;
+            }
 
-            console.log(currencies);
+            console.log("_currencies");
+            console.log(this._currencyList);
 
-            var test = this.getCurrencies_(currencies, value);
+            var test = this.getCurrencies_(this._currencyList, value);
 
             console.log("requestCurrency value");
             console.log(test);
@@ -113,12 +115,12 @@
         },
 
         getCurrencies_: function(req, value){
-            var currencies = req.getElementsByTagName('Cube');
+            var cubeList = req.getElementsByTagName('Cube');
             console.log("currencies");
-            console.log(currencies);
+            console.log(cubeList);
             var currencyValue;
-            for(var i = 0; i<currencies.length; i++){
-                var currencyAttributes = currencies[i].attributes;
+            for(var i = 0; i<cubeList.length; i++){
+                var currencyAttributes = cubeList[i].attributes;
 
                 for(var j = 0; j<currencyAttributes.length; j++){
                     var currentAttribute = currencyAttributes[j];
