@@ -17,21 +17,17 @@ Select = {
             Select.polling = window.setInterval(Select.onMouseUp(event), 200);
         });
     },
-    SetupBubble: function(){
-        bubbleDOM = document.createElement('div');
-        bubbleDOM.setAttribute('class', 'selection_bubble');
-        document.body.appendChild(bubbleDOM);
-    },
+    
     onMouseUp: function(event){
         window.clearInterval(Select.polling);
         if(Select.internalEvent == null){return;}
-        if(Select.selecting == true){Select.HideBubble(); return;}/* Don't do anything if already selecting */
+        if(Select.selecting === true){BubbleArea.HideBubble(); return;}/* Don't do anything if already selecting */
 
         /* Don't show the menu on right-click, b/c that'd be annoying. */
         if(Select.internalEvent.button == 0 /* Left-click only */ ) {
                 Select.selectionText = Select._getSelection();
                 console.log("selectionText" + Select.selectionText);
-                if(Select.selectionText) { Select.BuildBubble(event.clientX, event.clientY, Select.selectionText); } /* Show menu only on selection of text */
+                if(Select.selectionText) { BubbleArea.BuildBubble(event.clientX, event.clientY, Select.selectionText); } /* Show menu only on selection of text */
         }
         Select.internalEvent = null;
     },
@@ -55,12 +51,12 @@ Select = {
 
         if(currentInt === null)
             return;
-        currencyValue = currencyArea.requestCurrency("NOK");
+        currencyValue = CurrencyArea.requestCurrency("NOK");
 
         console.log("NOK");
         console.log(currencyValue);
 
-        currentCurrency = currencyArea.requestCurrency("USD");
+        currentCurrency = CurrencyArea.requestCurrency("USD");
         console.log("USD");
         console.log(currentCurrency);
 
@@ -72,7 +68,17 @@ Select = {
 
         value = value.toFixed(2);
 
-        return "USD: " + currentInt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ".- NOK: " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ".-";
+        return "USD: " + currentInt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " = NOK: " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ".-";
+    }    
+};
+
+var BubbleArea = BubbleArea || {};
+
+BubbleArea ={
+    SetupBubble: function(){
+        bubbleDOM = document.createElement('div');
+        bubbleDOM.setAttribute('class', 'selection_bubble');
+        document.body.appendChild(bubbleDOM);
     },
     BuildBubble: function(mouseX, mouseY, selection){
         console.log("mouseX: " + mouseX + "mouseY: " + mouseY + "Selection: " + selection);
@@ -86,13 +92,11 @@ Select = {
         Select.selecting = false;
         bubbleDOM.style.visibility = 'hidden';
     }
-};
+}
 
 var CurrencyArea = CurrencyArea || {};
 
-CurrencyArea._getCurrencyFeed = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
-
-var currencyArea = {
+CurrencyArea = {
 
     getCurrencyFeed_: 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',
     _currencyList: null,
@@ -138,44 +142,13 @@ var currencyArea = {
     }
 };
 
-    // var languageManager = {
-    //     var html = document.getElementsByTagName('html');
-    //         console.log(html);
-    //         for (var i = 0; i < html.length; i++) {
-    //             if (html[i].getAttribute("lang")) {
-    //                 console.log("lang: " + html[i].getAttribute("lang"));
-    //                 return html[i].getAttribute("content");
-    //             }                    
-    //             else if (html[i].getAttribute("xml:lang")) {
-    //                 console.log("xml lang: " + html[i].getAttribute("xml:lang"));
-    //                 return html[i].getAttribute("content");
-    //             }
-    //         }
-
-    //         getCorrectCountry: function(){
-    //             var countryCode = "USE"
-    //             switch(case this.html)
-    //             {
-    //             	case "en":
-    //             		countryCode = "USE";
-    //             		break;
-    //             	case "no":
-    //             		countryCode = "NOK";
-    //             		break;
-    //             }
-    //             return countryCode;
-    //         }
-    // }
-
 function AttachListner(){
     var t = window.setInterval(function(){
         if(/loaded|complete/.test(document.readyState)){
             window.clearInterval(t);            
             Select.Listener();
-            Select.SetupBubble();
+            BubbleArea.SetupBubble();
         }
     }, 10);
 };
-
-//languageManager.getCorrectCountry();
 AttachListner();
