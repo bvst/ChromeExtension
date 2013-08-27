@@ -5,4 +5,5 @@
   left: 0;
   background: black;
   color: yellow;
+  z-index: 9999;
 }
