@@ -6,6 +6,27 @@ String.prototype.numberformat = function(){
     return this.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
+(function(regexHelpers, undefined){
+    regexHelpers.usdFormat = function(string){
+        console.log(string);
+        return string.match(/(\$|dollar)+\s*\d/);
+    };
+
+    regexHelpers.euroFormat = function(string){
+        console.log(string);
+        return string.match(/(£|euro)+\s*\d/);
+    };
+
+    regexHelpers.findInt = function(string){
+        return string.match(/[0-9]+(?:\.[0-9]*)?/g).join("");
+    };
+
+    regexHelpers.numberFormat = function(string){
+        return string.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    };
+
+}(window.regexHelpers = window.regexHelpers || {}));
+
 (function(currencyIntergrator, undefined){
     var internalEvent = {};
     var polling = 0;
@@ -37,39 +58,29 @@ String.prototype.numberformat = function(){
                 }
         }
         internalEvent = null;
-    };
-
-
+    };    
 
     currencyIntergrator._getSelection = function() {
-        var w = window, d = document, s = '', u, currentInt, value, currencyValue, currentCurrency, newInt;
+        var currentInt, value, currencyValue, currentCurrency, newInt, currentCurrencyText = "USD: ";
 
-        if (w.getSelection != u) {
-            s = w.getSelection().toString();
-        }
-        else if (d.getSelection != u) {
-            s = d.getSelection().toString();
-        }
-        else if (d.selection) {
-            s = d.selection.createRange().text;
-        }
-        else { 
-            return ''; 
-        }
+        s = getSelectedText();
 
-        if(s === null || s === "") 
+        if(s === null || s === '') 
             return;
         //s = s.replace(",",".");
-        s = String(s).find();
+        currentCurrency = getCurrentCurrency(s);
+        if(currentCurrency === "1")
+            currentCurrencyText = "EUR: ";
+        s = regexHelpers.findInt(s);
         if(s === null)
             return;
         currentInt = parseFloat(s);
 
         if(currentInt === null)
             return;
+
         currencyValue = currencyArea.requestCurrency("NOK");
 
-        currentCurrency = currencyArea.requestCurrency("USD");
 
         newInt = currentInt / currentCurrency;
 
@@ -77,7 +88,45 @@ String.prototype.numberformat = function(){
 
         value = value.toFixed(2);
 
-        return "USD: " + String(currentInt).numberformat() + " = NOK: " + String(value).numberformat() + ".-";
+        return currentCurrencyText + String(currentInt).numberformat() + " = NOK: " + String(value).numberformat() + ".-";
+    };
+
+    function getSelectedText(){
+        var w = window, d = document, s = '';
+
+        if (w.getSelection !== undefined) {
+            s = w.getSelection().toString();
+        }
+        else if (d.getSelection !== undefined) {
+            s = d.getSelection().toString();
+        }
+        else if (d.selection) {
+            s = d.selection.createRange().text;
+        }
+        else { 
+            s =''; 
+        }
+        return s;
+    };
+
+    function getCurrentCurrency(selectedArea){
+        var currency;
+
+        console.log(selectedArea);
+
+        if(regexHelpers.usdFormat(selectedArea) !== null)
+            currency = "USD";
+
+        else if(regexHelpers.euroFormat(selectedArea) !== null)
+            currency = "1";
+
+        else
+            currency = "USD";
+
+        console.log(currency);
+        if(currency === "1")
+            return currency;
+        return currencyArea.requestCurrency(currency);
     };
 }(window.currencyIntergrator = window.currencyIntergrator || {}));
 
