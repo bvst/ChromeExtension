@@ -14,7 +14,12 @@ String.prototype.numberformat = function(){
 
     regexHelpers.euroFormat = function(string){
         console.log(string);
-        return string.match(/(£|euro)+\s*\d/);
+        return string.match(/(€|euro|EUR)+\s*\d/);
+    };
+
+    regexHelpers.pundFormat = function(string){
+        console.log(string);
+        return string.match(/(£|pund)+\s*\d/);
     };
 
     regexHelpers.findInt = function(string){
@@ -61,16 +66,19 @@ String.prototype.numberformat = function(){
     };    
 
     currencyIntergrator._getSelection = function() {
-        var currentInt, value, currencyValue, currentCurrency, newInt, currentCurrencyText = "USD: ";
+        var currentInt, value, currencyValue, currentCurrency, newInt, currentCurrencyText;
 
         s = getSelectedText();
 
         if(s === null || s === '') 
             return;
         //s = s.replace(",",".");
-        currentCurrency = getCurrentCurrency(s);
-        if(currentCurrency === "1")
-            currentCurrencyText = "EUR: ";
+        currentCurrencyText = getCurrencyLanguageCode(s);
+        if(currentCurrencyText !== "EUR")
+            currentCurrency = currencyArea.requestCurrency(currentCurrencyText);
+        else
+            currentCurrency = 1;
+
         s = regexHelpers.findInt(s);
         if(s === null)
             return;
@@ -88,7 +96,7 @@ String.prototype.numberformat = function(){
 
         value = value.toFixed(2);
 
-        return currentCurrencyText + String(currentInt).numberformat() + " = NOK: " + String(value).numberformat() + ".-";
+        return currentCurrencyText + ": " + String(currentInt).numberformat() + " = NOK: " + String(value).numberformat() + ".-";
     };
 
     function getSelectedText(){
@@ -109,24 +117,21 @@ String.prototype.numberformat = function(){
         return s;
     };
 
-    function getCurrentCurrency(selectedArea){
-        var currency;
+    function getCurrencyLanguageCode(selectedArea){
+        var currencyCode;
 
         console.log(selectedArea);
 
         if(regexHelpers.usdFormat(selectedArea) !== null)
-            currency = "USD";
-
+            currencyCode = "USD";
+        else if(regexHelpers.pundFormat(selectedArea) !== null)
+            currencyCode = "GBP";
         else if(regexHelpers.euroFormat(selectedArea) !== null)
-            currency = "1";
-
+            currencyCode = "EUR";
         else
-            currency = "USD";
+            currencyCode = "USD";
 
-        console.log(currency);
-        if(currency === "1")
-            return currency;
-        return currencyArea.requestCurrency(currency);
+        return currencyCode;
     };
 }(window.currencyIntergrator = window.currencyIntergrator || {}));
 

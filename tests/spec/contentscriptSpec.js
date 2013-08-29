@@ -78,15 +78,28 @@ describe("Regex helpers", function(){
 	});
 
 	it("should be euro currency format", function(){
-		var euroInt = '£123';
+		var euroInt = '€123';
 		var textInt = 'euro123';
-		var spaceEuroInt = 'qweqwe £ 123 qweqwe';
+		var spaceEuroInt = 'qweqwe € 123 qweqwe';
 		var spaceTextInt = 'qweqwe euro 123 qweqwe';
 
 		expect(r.euroFormat(euroInt)).not.toBe(null);
 		expect(r.euroFormat(textInt)).not.toBe(null);
 		expect(r.euroFormat(spaceEuroInt)).not.toBe(null);
 		expect(r.euroFormat(spaceTextInt)).not.toBe(null);
+
+	});
+
+	it("should be pund currency format", function(){
+		var pundInt = '£123';
+		var textInt = 'pund123';
+		var spacePundInt = 'qweqwe £ 123 qweqwe';
+		var spaceTextInt = 'qweqwe pund 123 qweqwe';
+
+		expect(r.pundFormat(pundInt)).not.toBe(null);
+		expect(r.pundFormat(textInt)).not.toBe(null);
+		expect(r.pundFormat(spacePundInt)).not.toBe(null);
+		expect(r.pundFormat(spaceTextInt)).not.toBe(null);
 
 	});
 });
